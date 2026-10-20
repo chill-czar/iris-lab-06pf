@@ -38,6 +38,17 @@ describe("API & Server Endpoints", () => {
     expect(json).toEqual({ ok: true });
   });
 
+  test("GET / serves the interactive HTML calculator UI", async () => {
+    const res = await fetch(`${baseUrl}/`);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    const html = await res.text();
+    expect(html).toContain("Simple Calculator");
+    expect(html).toContain("main-display");
+    expect(html).toContain("keypad");
+    expect(html).not.toContain("Scaffold is running");
+  });
+
   test("POST /api/calculate with expression evaluates correctly", async () => {
     const res = await fetch(`${baseUrl}/api/calculate`, {
       method: "POST",
@@ -91,5 +102,12 @@ describe("API & Server Endpoints", () => {
       method: "OPTIONS",
     });
     expect(res.status).toBe(204);
+  });
+
+  test("GET /nonexistent returns 404 JSON", async () => {
+    const res = await fetch(`${baseUrl}/nonexistent`);
+    expect(res.status).toBe(404);
+    const json = await res.json();
+    expect(json.ok).toBe(false);
   });
 });
